@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useSession, signOut } from "next-auth/react"
-import { Button } from "@/components/ui/button"
+import { useSession, signOut } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,36 +9,38 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Bell, Search, Settings, LogOut, User } from "lucide-react"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Bell, Search, Settings, LogOut, User } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 export function DashboardNav() {
-  const { data: session } = useSession()
+  const { data: session } = useSession();
 
-  const initials = session?.user?.name
-    ?.split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase() || "U"
+  const initials =
+    session?.user?.name
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase() || "U";
 
   return (
     <nav className="border-b bg-white px-6 py-4">
+      {" "}
+      {/* Removed ml-64 - now spans full width */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+        {/* Left side - Logo + Search */}
+        <div className="flex items-center space-x-36">
           <h1 className="text-xl font-bold text-gray-900">TaskFlow AI</h1>
-          
+
           {/* Search Bar */}
           <div className="relative w-96">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input 
-              placeholder="Search projects, tasks..." 
-              className="pl-10"
-            />
+            <Input placeholder="Search projects, tasks..." className="pl-10" />
           </div>
         </div>
 
+        {/* Right side - Actions and User Menu */}
         <div className="flex items-center space-x-4">
           {/* Notifications */}
           <Button variant="ghost" size="icon" className="relative">
@@ -51,7 +53,10 @@ export function DashboardNav() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || ""} />
+                  <AvatarImage
+                    src={session?.user?.image || ""}
+                    alt={session?.user?.name || ""}
+                  />
                   <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
               </Button>
@@ -89,5 +94,5 @@ export function DashboardNav() {
         </div>
       </div>
     </nav>
-  )
+  );
 }

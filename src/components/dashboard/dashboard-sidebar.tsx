@@ -1,21 +1,22 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { 
-  Home, 
-  FolderOpen, 
-  CheckSquare, 
-  Users, 
-  BarChart3, 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { CreateProjectForm } from "@/components/projects/create-project-form";
+import {
+  Home,
+  FolderOpen,
+  CheckSquare,
+  Users,
+  BarChart3,
   Calendar,
   Settings,
   Plus,
-  Bot
-} from "lucide-react"
+  Bot,
+} from "lucide-react";
 
 const navigation = [
   {
@@ -57,7 +58,7 @@ const navigation = [
     badge: "NEW",
     badgeVariant: "secondary" as const,
   },
-]
+];
 
 const bottomNavigation = [
   {
@@ -65,26 +66,24 @@ const bottomNavigation = [
     href: "/dashboard/settings",
     icon: Settings,
   },
-]
+];
 
 export function DashboardSidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
-    <div className="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200">
+    <div className="fixed top-16 left-0 bottom-0 z-40 w-64 bg-white border-r border-gray-200">
+      {/* Changed: top-16 (below navbar) instead of inset-y-0, z-40 instead of z-50 */}
       <div className="flex flex-col h-full">
         {/* Create Project Button */}
-        <div className="p-6">
-          <Button className="w-full justify-start" size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            New Project
-          </Button>
+        <div className="p-4">
+          
         </div>
 
         {/* Main Navigation */}
         <nav className="flex-1 px-4 space-y-1">
           {navigation.map((item) => {
-            const isActive = pathname === item.href
+            const isActive = pathname === item.href;
             return (
               <Link key={item.name} href={item.href}>
                 <div
@@ -98,13 +97,15 @@ export function DashboardSidebar() {
                   <item.icon
                     className={cn(
                       "mr-3 h-5 w-5 flex-shrink-0",
-                      isActive ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500"
+                      isActive
+                        ? "text-blue-500"
+                        : "text-gray-400 group-hover:text-gray-500"
                     )}
                   />
                   <span className="flex-1">{item.name}</span>
                   {item.badge && (
-                    <Badge 
-                      variant={item.badgeVariant || "default"} 
+                    <Badge
+                      variant={item.badgeVariant || "default"}
                       className="ml-2 text-xs"
                     >
                       {item.badge}
@@ -112,14 +113,14 @@ export function DashboardSidebar() {
                   )}
                 </div>
               </Link>
-            )
+            );
           })}
         </nav>
 
         {/* Bottom Navigation */}
         <div className="px-4 pb-4 space-y-1">
           {bottomNavigation.map((item) => {
-            const isActive = pathname === item.href
+            const isActive = pathname === item.href;
             return (
               <Link key={item.name} href={item.href}>
                 <div
@@ -133,16 +134,18 @@ export function DashboardSidebar() {
                   <item.icon
                     className={cn(
                       "mr-3 h-5 w-5 flex-shrink-0",
-                      isActive ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500"
+                      isActive
+                        ? "text-blue-500"
+                        : "text-gray-400 group-hover:text-gray-500"
                     )}
                   />
                   {item.name}
                 </div>
               </Link>
-            )
+            );
           })}
         </div>
       </div>
     </div>
-  )
+  );
 }
