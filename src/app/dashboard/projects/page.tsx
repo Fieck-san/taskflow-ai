@@ -16,8 +16,24 @@ import {
   Filter,
   MoreHorizontal,
   CheckSquare,
-  Clock
+  Clock,
+  Trash2,
+  Edit
 } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { format } from "date-fns"
 import toast from "react-hot-toast"
 
@@ -62,6 +78,9 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const fetchProjects = async () => {
     try {
@@ -120,6 +139,37 @@ export default function ProjectsPage() {
     const inProgress = tasks.filter(t => t.status === "IN_PROGRESS").length
     const todo = tasks.filter(t => t.status === "TODO").length
     return { completed, inProgress, todo, total: tasks.length }
+  }
+
+  const handleDeleteProject = async () => {
+    if (!projectToDelete) return
+    
+    setIsDeleting(true)
+    try {
+      const response = await fetch(`/api/projects/${projectToDelete.id}`, {
+        method: 'DELETE'
+      })
+      
+      if (response.ok) {
+        setProjects(projects.filter(p => p.id !== projectToDelete.id))
+        toast.success('Project deleted successfully')
+        setDeleteDialogOpen(false)
+        setProjectToDelete(null)
+      } else {
+        toast.error('Failed to delete project')
+      }
+    } catch (error) {
+      toast.error('Something went wrong')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const openDeleteDialog = (project: Project, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setProjectToDelete(project)
+    setDeleteDialogOpen(true)
   }
 
   const filteredProjects = projects.filter(project =>
@@ -209,17 +259,36 @@ export default function ProjectsPage() {
                         className="w-3 h-3 rounded-full flex-shrink-0 mt-1"
                         style={{ backgroundColor: project.color }}
                       />
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          // TODO: Add project menu
-                        }}
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                            }}
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link href={`/dashboard/projects/${project.id}`}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit Project
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="text-red-600 focus:text-red-600"
+                            onClick={(e) => openDeleteDialog(project, e)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete Project
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                     <div>
                       <CardTitle className="text-lg group-hover:text-blue-600 transition-colors">
@@ -306,6 +375,35 @@ export default function ProjectsPage() {
           })}
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Project</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{projectToDelete?.name}"? This action cannot be undone.
+              All tasks, comments, and project data will be permanently removed.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleDeleteProject}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete Project"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

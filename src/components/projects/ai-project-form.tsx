@@ -77,7 +77,7 @@ export function AIProjectForm({ onProjectCreated, children }: AIProjectFormProps
   const generateTasks = async (data: AIProjectForm) => {
     setIsGeneratingTasks(true)
     try {
-      const response = await fetch("/api/ai/suggest-tasks-mock", { // Using mock API for now
+      const response = await fetch("/api/ai/suggest-tasks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

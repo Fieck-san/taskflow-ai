@@ -110,8 +110,7 @@ export default function AIDashboardPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/ai/chat-mock", {
-        // Using mock API for now
+      const response = await fetch("/api/ai/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

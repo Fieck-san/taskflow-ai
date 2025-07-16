@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { openai, SYSTEM_PROMPTS, formatProjectForAI } from "@/lib/openai";
+import { ollama, SYSTEM_PROMPTS, formatProjectForAI } from "@/lib/ollama";
 import { z } from "zod";
 
 const chatSchema = z.object({
@@ -176,26 +176,10 @@ export async function POST(request: NextRequest) {
     }
 
     const fullMessage = contextData
-      ? `Context:\n${contextData}User Question: ${message}`
-      : message;
+      ? `${SYSTEM_PROMPTS.CHAT_ASSISTANT}\n\nContext:\n${contextData}User Question: ${message}`
+      : `${SYSTEM_PROMPTS.CHAT_ASSISTANT}\n\nUser Question: ${message}`;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: SYSTEM_PROMPTS.CHAT_ASSISTANT,
-        },
-        {
-          role: "user",
-          content: fullMessage,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: 600,
-    });
-
-    const aiResponse = completion.choices[0]?.message?.content;
+    const aiResponse = await ollama.generateResponse(fullMessage);
 
     if (!aiResponse) {
       return NextResponse.json(
